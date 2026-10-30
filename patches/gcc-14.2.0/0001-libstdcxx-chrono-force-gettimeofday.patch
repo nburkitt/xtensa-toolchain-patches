@@ -1,0 +1,25 @@
+--- a/libstdc++-v3/src/c++11/chrono.cc
++++ b/libstdc++-v3/src/c++11/chrono.cc
+@@ -26,9 +26,10 @@
+ #include <chrono>
+ 
+ // Conditional inclusion of sys/time.h for gettimeofday
+-#if !defined(_GLIBCXX_USE_CLOCK_MONOTONIC) && \
+-    !defined(_GLIBCXX_USE_CLOCK_REALTIME) && \
+-     defined(_GLIBCXX_USE_GETTIMEOFDAY)
++#if defined(_GLIBCXX_FORCE_GETTIMEOFDAY) || \
++    (!defined(_GLIBCXX_USE_CLOCK_MONOTONIC) && \
++     !defined(_GLIBCXX_USE_CLOCK_REALTIME) && \
++      defined(_GLIBCXX_USE_GETTIMEOFDAY))
+ #include <sys/time.h>
+ #endif
+ 
+@@ -50,7 +51,7 @@
+     system_clock::time_point
+     system_clock::now() noexcept
+     {
+-#ifdef _GLIBCXX_USE_CLOCK_REALTIME
++#if defined(_GLIBCXX_USE_CLOCK_REALTIME) && !defined(_GLIBCXX_FORCE_GETTIMEOFDAY)
+       timespec tp;
+       // -EINVAL, -EFAULT
+ #ifdef _GLIBCXX_USE_CLOCK_GETTIME_SYSCALL
